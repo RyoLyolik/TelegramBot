@@ -3,6 +3,19 @@ sys.path.insert(0, '../WebServer/')
 from layout import users, lvls, dbase
 import json
 import random
+import requests
+from speech import speech_it
+from local_module import *
+
+translate_token = 'trnsl.1.1.20180822T035034Z.c4e6b0734a1501db.3c10535039452db4d70963681df09234674e4b33'
+all_lang = ['az', 'sq', 'am', 'en', 'ar', 'hy', 'af', 'eu', 'ba', 'be', 'bn', 'my',
+            'bg', 'bs', 'cy', 'hu', 'vi', 'ht', 'gl', 'nl', 'mrj', 'el', 'ka', 'gu',
+            'da', 'he', 'yi', 'id', 'ga', 'it', 'is', 'es', 'kk', 'kn', 'ca', 'ky',
+            'zh', 'ko', 'xh', 'km', 'lo', 'la', 'lv', 'lt', 'lb', 'mg', 'ms', 'ml',
+            'mt', 'mk', 'mi', 'mr', 'mhr', 'mn', 'de', 'ne', 'no', 'pa', 'pap', 'fa',
+            'pl', 'pt', 'ro', 'ru', 'ceb', 'sr', 'si', 'sk', 'sl', 'sw', 'su', 'tg',
+            'th', 'tl', 'ta', 'tt', 'te', 'tr', 'udm', 'uz', 'uk', 'ur', 'fi', 'fr',
+            'hi', 'hr', 'cs', 'sv', 'gd', 'et', 'eo', 'jv', 'ja']
 
 class Answers:
     def __init__(self):
@@ -91,6 +104,94 @@ class Answers:
                     self.data['player']['regen'] = round((self.data['player']['regen']+1) * 1.04, 5)
                     return 'Готово. Теперь: \n❤️Жизни: '+str(self.data['player']['max_health'])+'\n❣️Регенерация: '+str(self.data['player']['regen']) + '\n💪🏻Сила: ' + str(self.data['player']['power'])+'\n💰Деньги: '+str(self.split_it(self.data['player']['money']))+'$'
                 return 'Недостаточно денег'
+            return 'Пока нельзя это улучшать'
+
+        elif body.lower().split()[:1] == ['переведи']:
+
+            eng_text = body.split()[1:]
+            langs = [eng_text[0], eng_text[1]]
+            eng_text = body.split()[3:]
+
+            eng_text = ' '.join(eng_text)
+            if langs[0] in all_lang and langs[1] in all_lang:
+                url_trans = 'https://translate.yandex.net/api/v1.5/tr.json/translate'
+                trans_option = {'key': translate_token, 'lang': langs[0] + "-" + langs[1], 'text': eng_text}
+                # trans_option = {'key': token, 'lang': "en-ru", 'text': eng_text}
+                webRequest = requests.get(url_trans, params=trans_option)
+                rus_text = webRequest.text
+                srez = 32 + len(langs[0]) + len(langs[1])
+                rus_text = rus_text[srez:(len(rus_text) - 3)]
+
+                return rus_text + '\n\nПереведено сервисом «Яндекс.Переводчик»\nhttp://translate.yandex.ru/'
+
+        elif body.lower() == 'языки':
+            return '''азербайджанский	az	\nмалаялам	ml\n\
+                    албанский	sq	\nмальтийский	mt\n\
+                    амхарский	am	\nмакедонский	mk\n\
+                    английский	en	\nмаори	mi\n\
+                    арабский	ar	\nмаратхи	mr\n\
+                    армянский	hy	\nмарийский	mhr\n\
+                    африкаанс	af	\nмонгольский	mn\n\
+                    баскский	eu	\nнемецкий	de\n\
+                    башкирский	ba	\nнепальский	ne\n\
+                    белорусский	be	\nнорвежский	no\n\
+                    бенгальский	bn	\nпанджаби	pa\n\
+                    бирманский	my	\nпапьяменто	pap\n\
+                    болгарский	bg	\nперсидский	fa\n\
+                    боснийский	bs	\nпольский	pl\n\
+                    валлийский	cy	\nпортугальский	pt\n\
+                    венгерский	hu	\nрумынский	ro\n\
+                    вьетнамский	vi	\nрусский	ru\n\
+                    гаитянский (креольский)	ht	\nсебуанский	ceb\n\
+                    галисийский	gl	\nсербский	sr\n\
+                    голландский	nl	\nсингальский	si\n\
+                    горномарийский	\nmrj	словацкий	sk\n\
+                    греческий	el	\nсловенский	sl\n\
+                    грузинский	ka	\nсуахили	sw\n\
+                    гуджарати	gu	\nсунданский	su\n\
+                    датский	da	\nтаджикский	tg\n\
+                    иврит	he	\nтайский	th\n\
+                    идиш	yi	\nтагальский	tl\n\
+                    индонезийский	id	\nтамильский	ta\n\
+                    ирландский	ga	\nтатарский	tt\n\
+                    итальянский	it	\nтелугу	te\n\
+                    исландский	is	\nтурецкий	tr\n\
+                    испанский	es	\nудмуртский	udm\n\
+                    казахский	kk	\nузбекский	uz\n\
+                    каннада	kn	\nукраинский	uk\n\
+                    каталанский	ca	\nурду	ur\n\
+                    киргизский	ky	\nфинский	fi\n\
+                    китайский	zh	\nфранцузский	fr\n\
+                    корейский	ko	\nхинди	hi\n\
+                    коса	xh	\nхорватский	hr\n\
+                    кхмерский	km	\nчешский	cs\n\
+                    лаосский	lo	\nшведский	sv\n\
+                    латынь	la	\nшотландский	gd\n\
+                    латышский	lv	\nэстонский	et\n\
+                    литовский	lt	\nэсперанто	eo\n\
+                    люксембургский	lb	\nяванский	jv\n\
+                    малагасийский	mg	\nяпонский	ja\n\
+                    малайский	ms'''
+        elif body.lower().split()[0] == 'скажи':
+            speech_it(' '.join(body.lower().split()[1:]))
+            return "file audio"
+
+        elif body.lower().split()[0] == 'граф':
+            if body.lower().split()[1] == 'рандом':
+                nums = random.choice(range(1, 15))
+                points = [i for i in range(nums)]
+                comps = random.choice(range(nums, nums + 5))
+                cord = [list(set([random.choice(points) for i in range(random.choice(range(1, 5)))]))
+                        for i in range(nums)]
+            else:
+                cord = json.loads(body.lower().split()[1:])
+
+            draw(cord)
+            return 'file image'
+
+
+
+
     def save(self):
         self.data['player']['money'] = int(round(self.data['player']['money'], 0))
         file = open('../WebServer/databases/player/set_' + str(self.user[0]) + '.json', mode='w')

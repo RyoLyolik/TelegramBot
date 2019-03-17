@@ -17,9 +17,19 @@ def repeat_all_messages(message):
     body= message.text
     if users.get_by_tele(message.from_user.id) is not None:
         mes = ans.get_answer(body, message)
-        if mes is not None:
+        if mes is not None and mes.split()[0] != 'file':
             bot.send_message(message.chat.id, mes)
-            ans.save()
+
+        elif mes is not None and mes.split()[1] == 'audio':
+            audio = open('speeched.mp3', mode='rb')
+            bot.send_audio(message.chat.id, audio)
+            audio.close()
+
+        elif mes is not None and mes.split()[1] == 'audio':
+            image = open('drew.png', mode='rb')
+            bot.send_audio(message.chat.id, image)
+            image.close()
+
     else:
         if ' '.join(message.text.split()[:2]) != 'LOG IN':
             bot.send_message(message.chat.id, '''You must log in. Write:
@@ -34,6 +44,7 @@ def repeat_all_messages(message):
             answer = users.update_telegram_id(email,password, message.from_user.id)
             users.update_telegram_id(email, password, message.from_user.id)
             bot.send_message(message.chat.id, answer)
+
 
 
 if __name__ == '__main__':
