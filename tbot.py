@@ -19,6 +19,7 @@ def repeat_all_messages(message):
         mes = ans.get_answer(body, message)
         if mes is not None and mes.split()[0] != 'file':
             bot.send_message(message.chat.id, mes)
+            ans.save()
 
         elif mes is not None and mes.split()[1] == 'audio':
             audio = open('speeched.mp3', mode='rb')

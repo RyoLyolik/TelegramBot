@@ -28,13 +28,19 @@ class Answers:
         self.data = file.read()
         self.data = json.loads(self.data)
         file.close()
+        self.status = self.user[7]
         if body.lower() == 'id':
-            return 'Telegram: ' + str(self.user[-1]) + '\nIn game: ' + str(self.user[0])
+            return 'Telegram: ' + str(self.user[6]) + '\nIn game: ' + str(self.user[0])
 
         elif body.lower() == 'профиль':
             user = users.get_by_tele(message.from_user.id)
 
-            return '🆔: '+str(self.user[0])+'\n'+'❤️Жизни: '+str(self.data['player']['max_health'])+'\n❣️Регенерация: '+str(self.data['player']['regen']) + '\n💪🏻Сила: ' + str(self.data['player']['power'])+'\n💰Деньги: '+str(self.split_it(self.data['player']['money']))+'$'
+            return '🆔: '+str(self.user[0])+'\n'+\
+                   '❤️Жизни: '+str(self.data['player']['max_health'])+\
+                   '\n❣️Регенерация: '+str(self.data['player']['regen']) + \
+                   '\n💪🏻Сила: ' + str(self.data['player']['power'])+\
+                   '\n💰Деньги: '+str(self.split_it(self.data['player']['money']))+'$'+\
+                   '\n⭐Статус: ' + self.status
 
         elif body.lower().split()[0] == 'казино':
             body = body.lower().split()
@@ -92,7 +98,7 @@ class Answers:
             return '💵На счете: '+str(self.split_it(self.data['player']['money']))+'$'
 
         elif body.lower() == 'помощь':
-            return '🙎🏻‍♂️️Профиль\n💸Баланс\n🎰Казино'
+            return '🙎🏻‍♂️️Профиль\n💸Баланс\n🎰Казино\n🏴󠁧󠁢󠁥󠁮󠁧󠁿Переведи <с> <на> <текст>\n🖊Граф <список>/рандом\n🎤Скажи <слова>\n\nVersion 0.05'
 
         elif body.lower().split()[0] == 'улучшить':
             if body.lower().split()[1] == 'себя':
@@ -187,6 +193,13 @@ class Answers:
                 cord = json.loads(body.lower().split()[1:])
             graph(cord)
             return 'file image|'+str(cord)
+
+        if self.status == 'Admin':
+            if body.lower().split()[0] == 'получить':
+                if body.lower().split()[1].isdigit:
+                    self.data['player']['money'] += int(body.lower().split()[1])
+                    return 'Готово. \nБаланс:💰'+self.split_it(self.data['player']['money'])+'$'
+
 
     def save(self):
         self.data['player']['money'] = int(round(self.data['player']['money'], 0))
