@@ -25,9 +25,9 @@ def repeat_all_messages(message):
             bot.send_audio(message.chat.id, audio)
             audio.close()
 
-        elif mes is not None and mes.split()[1] == 'audio':
+        elif mes is not None and mes.split('|')[0].split()[1] == 'image':
             image = open('drew.png', mode='rb')
-            bot.send_audio(message.chat.id, image)
+            bot.send_photo(message.chat.id, image, 'Вот граф '+mes.split('|')[1])
             image.close()
 
     else:

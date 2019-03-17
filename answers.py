@@ -185,12 +185,8 @@ class Answers:
                         for i in range(nums)]
             else:
                 cord = json.loads(body.lower().split()[1:])
-
-            draw(cord)
-            return 'file image'
-
-
-
+            graph(cord)
+            return 'file image|'+str(cord)
 
     def save(self):
         self.data['player']['money'] = int(round(self.data['player']['money'], 0))
