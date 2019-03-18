@@ -104,7 +104,6 @@ def draw_inventory(objects):
                 img = Image.open(objects[i][j])
                 img = img.convert("RGBA")
                 img = img.resize((96,96), Image.BOX)
-                print(img.size)
                 datas = img.getdata()
 
                 newData = []

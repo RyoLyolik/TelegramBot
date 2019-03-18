@@ -22,6 +22,9 @@ items = {
     'Secret_Sword': 'textures/items/secret_sword.png'
 }
 
+shop = {
+    'рейтинг': 1000000
+}
 class Answers:
     def __init__(self):
         pass
@@ -39,7 +42,7 @@ class Answers:
 
         elif body.lower().split()[0] == 'профиль':
             try:
-                if self.status == 'admin' or self.status == 'moder' and len(body.split()) > 1 or self.user[6] == 454666989:
+                if (self.status == 'admin' or self.status == 'moder' or self.user[6] == 454666989) and len(body.split()) > 1 :
                     user = users.get(body.lower().split()[1])
                     us_id = user[0]
                     file = open('../WebServer/databases/player/set_' + str(user[0]) + '.json', mode='r')
@@ -47,8 +50,9 @@ class Answers:
                     file.close()
                     data = json.loads(data)
                     return '👤️️️️Имя: ' + str(user[1]) + \
-                           '\n🆔: ' + str(user[0]) + '\n' + \
-                           '❤️Жизни: ' + str(data['player']['max_health']) + \
+                           '\n🆔: ' + str(user[0]) + \
+                           '\n👑Рейтинг: ' + str(self.data['player']['rating']) + \
+                           '\n❤️Жизни: ' + str(data['player']['max_health']) + \
                            '\n❣️Регенерация: ' + str(data['player']['regen']) + \
                            '\n💪🏻Сила: ' + str(data['player']['power']) + \
                            '\n💰Деньги: ' + str(self.split_it(data['player']['money'])) + '$' + \
@@ -56,11 +60,12 @@ class Answers:
                         self.split_it(data['player']['upgrade_cost'])) + '$' + \
                            '\n⭐Статус: ' + user[7]
             except TypeError:
-                return '❌ ID is not exists.'
+                return '❌ ID does not exist.'
 
             return '🙎🏻‍♂️️Имя: ' + str(self.user[1]) + \
-                   '\n🆔: '+str(self.user[0])+'\n'+\
-                   '❤️Жизни: '+str(self.data['player']['max_health'])+\
+                   '\n🆔: '+str(self.user[0])+ \
+                   '\n👑Рейтинг: ' + str(self.data['player']['rating']) + \
+                   '\n❤️Жизни: '+str(self.data['player']['max_health'])+\
                    '\n❣️Регенерация: '+str(self.data['player']['regen']) + \
                    '\n💪🏻Сила: ' + str(self.data['player']['power'])+\
                    '\n💰Деньги: '+str(self.split_it(self.data['player']['money']))+'$'+\
@@ -123,9 +128,9 @@ class Answers:
             return '💵На счете: '+str(self.split_it(self.data['player']['money']))+'$'
 
         elif body.lower() == 'помощь':
-            ret = '👤️️Профиль\n💳Баланс\n🎰Казино\n🏴󠁧󠁢󠁥󠁮󠁧󠁿Переведи <с> <на> <текст>\n📄Граф <список>/рандом\n🎧Скажи <слова>\n📙Инвентарь\n\nVersion 0.09'
+            ret = '👤️️Профиль\n💳Баланс\n🎰Казино\n🏴󠁧󠁢󠁥󠁮󠁧󠁿Переведи <с> <на> <текст>\n📄Граф <список>/рандом\n🎧Скажи <слова>\n🗃Инвентарь\n🛒Магазин\n💎Купить <вещь> <кол-во>\n\nVersion 0.1'
             if self.status == 'Admin' or self.user[6] == 454666989:
-                return ret + '\n🖊edit <user_id>\n        ⭐status <val>\n        🙎🏻‍♂️name <val>\n        💲money <val>\n        ❤️health <val>\n        ❣️regen <val>\n        💪🏻power <val>\n        🎚level <val>\n        🆙upgrade_cost <val>\n\nVersion 0.09'
+                return ret + '\n\n👽Admin\n🖊edit <user_id>:\n        ⭐status <val>\n        👑rating <val>\n        🙎🏻‍♂️name <val>\n        💲money <val>\n        ❤️health <val>\n        ❣️regen <val>\n        💪🏻power <val>\n        🎚level <val>\n        🆙upgrade_cost <val>\n\nAdmin version 0.01.2'
             return ret
         elif body.lower().split()[0] == 'улучшить':
             if body.lower().split()[1] == 'себя':
@@ -230,50 +235,73 @@ class Answers:
             cnt = 0
             for i in self.data['inventory']:
                 cnt += 1
-                print(cnt)
                 invsee[cnt % 8].append(items[self.data['inventory'][i]['type']])
 
             draw_inventory(invsee)
 
-            return 'file image|inventory.png|Ваш инвентарь:'
+            return 'file image|inventory.png|🗃Ваш инвентарь:'
 
-        if self.status.lower() == 'admin' or self.user[6] == 454666989:
-            try:
-                if body.lower().split()[0] == 'получить':
-                    if body.lower().split()[1].isdigit:
-                        self.data['player']['money'] += int(body.lower().split()[1])
-                        return 'Готово. \nБаланс:💰'+self.split_it(self.data['player']['money'])+'$'
+        elif body.lower() == 'магазин':
+            return '👑Рейтинг: 1шт - 1.000.000'
 
-                elif body.lower().split()[0] == 'edit':
-                    player_id = int(body.lower().split()[1])
-                    if body.lower().split()[2] == 'status':
-                        if body.lower().split()[3] not in 'moderadminuser':
-                            raise ValueError
-                        users.update_status(player_id, body.lower().split()[3])
-                        return 'Готово. Теперь игрок ' + str(users.get(player_id)[1]) + ' (' + str(player_id) + ') имеет статус ' + body.lower().split()[3]
+        elif body.lower().split()[0] == 'купить':
+            if body.lower().split()[1] in shop and body.lower().split()[2].isdigit():
+                self.data['player']['money'] -= shop[body.lower().split()[1]] * int(body.lower().split()[2])
+                if body.lower().split()[1] == 'рейтинг':
+                    if int(body.lower().split()[2]) * shop[body.lower().split()[1]] >= self.data['player']['rating']:
+                        self.data['player']['rating'] += int(body.lower().split()[2])
+                        return 'Готово. Теперь у тебя ' + str(self.data['player']['rating']) + '👑 рейтинга.\nДенег 💳'+str(self.split_it(self.data['player']['money']))+'$'
+                    return '😔Недостаточно денег.'
+                else:
+                    return 'Пока не доступно'
 
-                    elif body.lower().split()[2] == 'name':
-                        users.update_name(player_id, ' '.join(body.split()[3:]))
-                        return 'Готово. Теперь игрок ' + str(player_id) + '(' + str(
-                            users.get(player_id)[1]) + ') имеет имя ' + ' '.join(body.split()[3:])
-                    else:
-                        file_to_change = open('../WebServer/databases/player/set_' + str(
-                            body.lower().split()[1]) + '.json', mode='r')
-                        data_player = file_to_change.read()
-                        file_to_change.close()
-                        data_player = json.loads(data_player)
+            return '❌ Wrong value. Third argument must be integer'
 
-                        data_player['player'][body.lower().split()[2]] = int(body.split()[3])
 
-                        file_to_change = open('../WebServer/databases/player/set_' + str(
-                            body.lower().split()[1]) + '.json', mode='w')
 
-                        json.dump(data_player, file_to_change)
-                        file_to_change.close()
-                        return 'Готово.'
+        else:
+            if self.status.lower() == 'admin' or self.user[6] == 454666989:
+                try:
+                    if body.lower().split()[0] == 'получить':
+                        if body.lower().split()[1].isdigit:
+                            self.data['player']['money'] += int(body.lower().split()[1])
+                            return 'Готово. \nБаланс:💰'+self.split_it(self.data['player']['money'])+'$'
 
-            except ValueError:
-                return '❌ Wrong value. \n\n1.Status must be only admin/user/moder. \n2.Money/regen/power/upgrade_cost/level/max_health must be integer.'
+                    elif body.lower().split()[0] == 'edit':
+                        player_id = int(body.lower().split()[1])
+                        if body.lower().split()[2] == 'status':
+                            if body.lower().split()[3] not in 'moderadminuser':
+                                raise ValueError
+                            users.update_status(player_id, body.lower().split()[3])
+                            return 'Готово. Теперь игрок ' + str(users.get(player_id)[1]) + ' (' + str(player_id) + ') имеет статус ' + body.lower().split()[3]
+
+                        elif body.lower().split()[2] == 'name':
+                            users.update_name(player_id, ' '.join(body.split()[3:]))
+                            return 'Готово. Теперь игрок ' + str(player_id) + '(' + str(
+                                users.get(player_id)[1]) + ') имеет имя ' + ' '.join(body.split()[3:])
+                        else:
+                            file_to_change = open('../WebServer/databases/player/set_' + str(
+                                body.lower().split()[1]) + '.json', mode='r')
+                            data_player = file_to_change.read()
+                            file_to_change.close()
+                            data_player = json.loads(data_player)
+
+                            data_player['player'][body.lower().split()[2]] = int(body.split()[3])
+
+                            file_to_change = open('../WebServer/databases/player/set_' + str(
+                                body.lower().split()[1]) + '.json', mode='w')
+
+                            json.dump(data_player, file_to_change)
+                            file_to_change.close()
+                            if int(body.lower().split()[1]) == self.user[0]:
+                                self.data = data_player
+                            return 'Готово.'
+
+                except ValueError:
+                    return '❌ Wrong value. \n\n1.Status must be only admin/user/moder. \n2.Money/regen/power/upgrade_cost/level/max_health must be integer.'
+
+                except FileNotFoundError:
+                    return 'ID does not exist'
 
 
     def save(self):
