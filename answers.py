@@ -17,7 +17,6 @@ all_lang = ['az', 'sq', 'am', 'en', 'ar', 'hy', 'af', 'eu', 'ba', 'be', 'bn', 'm
             'th', 'tl', 'ta', 'tt', 'te', 'tr', 'udm', 'uz', 'uk', 'ur', 'fi', 'fr',
             'hi', 'hr', 'cs', 'sv', 'gd', 'et', 'eo', 'jv', 'ja']
 
-# def get_
 
 class Answers:
     def __init__(self):
@@ -43,6 +42,7 @@ class Answers:
                    '\n❣️Регенерация: '+str(self.data['player']['regen']) + \
                    '\n💪🏻Сила: ' + str(self.data['player']['power'])+\
                    '\n💰Деньги: '+str(self.split_it(self.data['player']['money']))+'$'+\
+                   '\n🆙Стоимсоть улучшения: '+str(self.split_it(self.data['player']['upgrade_cost']))+'$'+\
                    '\n⭐Статус: ' + self.status
 
         elif body.lower().split()[0] == 'казино':
@@ -95,13 +95,15 @@ class Answers:
                 b = random.choice((0.5,1,2))
             money += bet
             self.data['player']['money'] = money
-            return 'Тебе попалось х'+str(b)+'\n💵Денег: '+str(self.split_it(int(money)))+'$'
+            return 'Тебе попалось х'+str(b)+'\n💸Денег: '+str(self.split_it(int(money)))+'$'
 
         elif body.lower() == 'баланс':
             return '💵На счете: '+str(self.split_it(self.data['player']['money']))+'$'
 
         elif body.lower() == 'помощь':
-            return '🙎🏻‍♂️️Профиль\n💸Баланс\n🎰Казино\n🏴󠁧󠁢󠁥󠁮󠁧󠁿Переведи <с> <на> <текст>\n🖊Граф <список>/рандом\n🎤Скажи <слова>\n\nVersion 0.07'
+            ret = '🙎🏻‍♂️️Профиль\n💸Баланс\n🎰Казино\n🏴󠁧󠁢󠁥󠁮󠁧󠁿Переведи <с> <на> <текст>\n📄Граф <список>/рандом\n🎤Скажи <слова>\n\nVersion 0.075'
+            if self.user[7] == 'Admin' or self.user[6] == 454666989:
+                return '🙎🏻‍♂️️Профиль\n💸Баланс\n🎰Казино\n🏴󠁧󠁢󠁥󠁮󠁧󠁿Переведи <с> <на> <текст>\n📄Граф <список>/рандом\n🎤Скажи <слова>\n🖊edit profile\n        ⭐status\n        🙎🏻‍♂️name\n        💲money\n        ❤️health\n        ❣️regen\n        💪🏻power\n        🎚level\n        🆙upgrade_cost\n\nVersion 0.07'
 
         elif body.lower().split()[0] == 'улучшить':
             if body.lower().split()[1] == 'себя':
