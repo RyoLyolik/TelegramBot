@@ -17,6 +17,8 @@ all_lang = ['az', 'sq', 'am', 'en', 'ar', 'hy', 'af', 'eu', 'ba', 'be', 'bn', 'm
             'th', 'tl', 'ta', 'tt', 'te', 'tr', 'udm', 'uz', 'uk', 'ur', 'fi', 'fr',
             'hi', 'hr', 'cs', 'sv', 'gd', 'et', 'eo', 'jv', 'ja']
 
+# def get_
+
 class Answers:
     def __init__(self):
         pass
@@ -35,7 +37,8 @@ class Answers:
         elif body.lower() == 'профиль':
             user = users.get_by_tele(message.from_user.id)
 
-            return '🆔: '+str(self.user[0])+'\n'+\
+            return '🙎🏻‍♂️️Имя: ' + str(self.user[1]) + \
+                   '\n🆔: '+str(self.user[0])+'\n'+\
                    '❤️Жизни: '+str(self.data['player']['max_health'])+\
                    '\n❣️Регенерация: '+str(self.data['player']['regen']) + \
                    '\n💪🏻Сила: ' + str(self.data['player']['power'])+\
@@ -98,7 +101,7 @@ class Answers:
             return '💵На счете: '+str(self.split_it(self.data['player']['money']))+'$'
 
         elif body.lower() == 'помощь':
-            return '🙎🏻‍♂️️Профиль\n💸Баланс\n🎰Казино\n🏴󠁧󠁢󠁥󠁮󠁧󠁿Переведи <с> <на> <текст>\n🖊Граф <список>/рандом\n🎤Скажи <слова>\n\nVersion 0.05'
+            return '🙎🏻‍♂️️Профиль\n💸Баланс\n🎰Казино\n🏴󠁧󠁢󠁥󠁮󠁧󠁿Переведи <с> <на> <текст>\n🖊Граф <список>/рандом\n🎤Скажи <слова>\n\nVersion 0.07'
 
         elif body.lower().split()[0] == 'улучшить':
             if body.lower().split()[1] == 'себя':
@@ -178,7 +181,7 @@ class Answers:
                     люксембургский	lb	\nяванский	jv\n\
                     малагасийский	mg	\nяпонский	ja\n\
                     малайский	ms'''
-        elif body.lower().split()[0] == 'скажи':
+        elif body.lower().split()[0] == 'скажи' or body.lower().split()[0] == 'ттс' or body.lower().split()[0] == 'tts':
             speech_it(' '.join(body.lower().split()[1:]))
             return "file audio"
 
@@ -190,15 +193,41 @@ class Answers:
                 cord = [list(set([random.choice(points) for i in range(random.choice(range(1, 5)))]))
                         for i in range(nums)]
             else:
-                cord = json.loads(body.lower().split()[1:])
+                cord = json.loads(' '.join(body.lower().split()[1:]))
             graph(cord)
             return 'file image|'+str(cord)
 
-        if self.status == 'Admin':
+        if self.status.lower() == 'admin' or self.user[6] == 454666989:
             if body.lower().split()[0] == 'получить':
                 if body.lower().split()[1].isdigit:
                     self.data['player']['money'] += int(body.lower().split()[1])
                     return 'Готово. \nБаланс:💰'+self.split_it(self.data['player']['money'])+'$'
+
+            elif body.lower().split()[0] == 'edit':
+                player_id = int(body.lower().split()[1])
+                if body.lower().split()[2] == 'status':
+                    users.update_status(player_id, body.lower().split()[3])
+                    return 'Готово. Теперь игрок ' + str(player_id) + '(' + str(users.get(player_id)[1]) + ') имеет статус ' + body.lower().split()[3]
+
+                elif body.lower().split()[2] == 'name':
+                    users.update_name(player_id, ' '.join(body.split()[3:]))
+                    return 'Готово. Теперь игрок ' + str(player_id) + '(' + str(
+                        users.get(player_id)[1]) + ') имеет имя ' + ' '.join(body.split()[3:])
+                else:
+                    file_to_change = open('../WebServer/databases/player/set_' + str(
+                        body.lower().split()[1]) + '.json', mode='r')
+                    data_player = file_to_change.read()
+                    file_to_change.close()
+                    data_player = json.loads(data_player)
+
+                    data_player['player'][body.lower().split()[2]] = int(body.split()[3])
+
+                    file_to_change = open('../WebServer/databases/player/set_' + str(
+                        body.lower().split()[1]) + '.json', mode='w')
+
+                    json.dump(data_player, file_to_change)
+                    file_to_change.close()
+                    return 'Готово.'
 
 
     def save(self):
