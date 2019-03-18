@@ -4,7 +4,6 @@ from layout import users, lvls, dbase
 import json
 import random
 import requests
-from speech import speech_it
 from local_module import *
 
 translate_token = 'trnsl.1.1.20180822T035034Z.c4e6b0734a1501db.3c10535039452db4d70963681df09234674e4b33'
@@ -17,6 +16,11 @@ all_lang = ['az', 'sq', 'am', 'en', 'ar', 'hy', 'af', 'eu', 'ba', 'be', 'bn', 'm
             'th', 'tl', 'ta', 'tt', 'te', 'tr', 'udm', 'uz', 'uk', 'ur', 'fi', 'fr',
             'hi', 'hr', 'cs', 'sv', 'gd', 'et', 'eo', 'jv', 'ja']
 
+items = {
+    'Hand':None,
+    'Usual_Sword': 'textures/items/usual_sword.png',
+    'Secret_Sword': 'textures/items/secret_sword.png'
+}
 
 class Answers:
     def __init__(self):
@@ -42,7 +46,7 @@ class Answers:
                     data = file.read()
                     file.close()
                     data = json.loads(data)
-                    return '🙎🏻‍♂️️Имя: ' + str(user[1]) + \
+                    return '👤️️️️Имя: ' + str(user[1]) + \
                            '\n🆔: ' + str(user[0]) + '\n' + \
                            '❤️Жизни: ' + str(data['player']['max_health']) + \
                            '\n❣️Регенерация: ' + str(data['player']['regen']) + \
@@ -119,10 +123,10 @@ class Answers:
             return '💵На счете: '+str(self.split_it(self.data['player']['money']))+'$'
 
         elif body.lower() == 'помощь':
-            ret = '🙎🏻‍♂️️Профиль\n💸Баланс\n🎰Казино\n🏴󠁧󠁢󠁥󠁮󠁧󠁿Переведи <с> <на> <текст>\n📄Граф <список>/рандом\n🎤Скажи <слова>\n\nVersion 0.08'
+            ret = '👤️️Профиль\n💳Баланс\n🎰Казино\n🏴󠁧󠁢󠁥󠁮󠁧󠁿Переведи <с> <на> <текст>\n📄Граф <список>/рандом\n🎧Скажи <слова>\n📙Инвентарь\n\nVersion 0.09'
             if self.status == 'Admin' or self.user[6] == 454666989:
-                return '🙎🏻‍♂️️Профиль\n💸Баланс\n🎰Казино\n🏴󠁧󠁢󠁥󠁮󠁧󠁿Переведи <с> <на> <текст>\n📄Граф <список>/рандом\n🎤Скажи <слова>\n🖊edit <user_id>\n        ⭐status <val>\n        🙎🏻‍♂️name <val>\n        💲money <val>\n        ❤️health <val>\n        ❣️regen <val>\n        💪🏻power <val>\n        🎚level <val>\n        🆙upgrade_cost <val>\n\nVersion 0.07'
-
+                return ret + '\n🖊edit <user_id>\n        ⭐status <val>\n        🙎🏻‍♂️name <val>\n        💲money <val>\n        ❤️health <val>\n        ❣️regen <val>\n        💪🏻power <val>\n        🎚level <val>\n        🆙upgrade_cost <val>\n\nVersion 0.09'
+            return ret
         elif body.lower().split()[0] == 'улучшить':
             if body.lower().split()[1] == 'себя':
                 if self.data['player']['money'] >= self.data['player']['upgrade_cost']:
@@ -131,7 +135,11 @@ class Answers:
                     self.data['player']['upgrade_cost'] = int(round(((self.data['player']['upgrade_cost']) * 1.06), 0))
                     self.data['player']['max_health'] = int(round(((self.data['player']['max_health'])*1.04),0))
                     self.data['player']['regen'] = round((self.data['player']['regen']+1) * 1.04, 5)
-                    return 'Готово. Теперь: \n❤️Жизни: '+str(self.data['player']['max_health'])+'\n❣️Регенерация: '+str(self.data['player']['regen']) + '\n💪🏻Сила: ' + str(self.data['player']['power'])+'\n💰Деньги: '+str(self.split_it(self.data['player']['money']))+'$'
+                    return 'Готово. Теперь: \n❤️Жизни: ' + str(
+                        self.data['player']['max_health']) + '\n❣️Регенерация: ' + str(
+                        self.data['player']['regen']) + '\n💪🏻Сила: ' + str(
+                        self.data['player']['power']) + '\n💰Деньги: ' + str(
+                        self.split_it(self.data['player']['money'])) + '$'
                 return 'Недостаточно денег'
             return 'Пока нельзя это улучшать'
 
@@ -215,7 +223,19 @@ class Answers:
             else:
                 cord = json.loads(' '.join(body.lower().split()[1:]))
             graph(cord)
-            return 'file image|'+str(cord)
+            return 'file image|drew.png|Вот граф '+str(cord)
+
+        elif body.lower().split()[0] == 'инвентарь':
+            invsee = [[],[],[],[],[],[],[],[]]
+            cnt = 0
+            for i in self.data['inventory']:
+                cnt += 1
+                print(cnt)
+                invsee[cnt % 8].append(items[self.data['inventory'][i]['type']])
+
+            draw_inventory(invsee)
+
+            return 'file image|inventory.png|Ваш инвентарь:'
 
         if self.status.lower() == 'admin' or self.user[6] == 454666989:
             try:

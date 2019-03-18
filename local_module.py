@@ -1,6 +1,12 @@
 import tkinter
 import random
 import math
+from gtts import gTTS
+from PIL import Image, ImageDraw
+from PIL import ImageFont
+import random
+
+font = ImageFont.truetype("arial.ttf", 150)
 
 def prime(n):
     lis = []
@@ -54,16 +60,11 @@ def lowsearch(lis, n):
     return l
 
 
-from PIL import Image, ImageDraw
-from PIL import ImageFont
-import random
+def speech_it(text):
+    tts = gTTS(text=text, lang='ru')
+    name = "speeched.mp3"
+    tts.save(name)
 
-image = Image.new("RGBA", (320,320), (0,0,0,0))
-draw = ImageDraw.Draw(image)
-
-
-draw.line((0, 0,10,10), fill='red')
-font = ImageFont.truetype("arial.ttf", 150)
 
 def graph(lis):
     image = Image.new("RGBA", (920,920),(0,0,0,0))
@@ -89,6 +90,33 @@ def graph(lis):
 
     image.save("drew.png", "PNG")
 
+
+def draw_inventory(objects):
+    image = Image.new("RGBA", (960, 600), (35, 35, 35, 255))
+    canvas = ImageDraw.Draw(image)
+    k = 120
+
+    for i in range(len(objects)):
+        canvas.line((k * i, 0, k * i, 1200), fill='gray', width=2)
+        for j in range(len(objects[i])):
+            canvas.line((0, k * j, 1920, k * j), fill='gray', width=2)
+            if objects[i][j] is not None:
+                img = Image.open(objects[i][j])
+                img = img.convert("RGBA")
+                img = img.resize((96,96), Image.BOX)
+                print(img.size)
+                datas = img.getdata()
+
+                newData = []
+                for item in datas:
+                    if item[3] == 0:
+                        newData.append((35, 35, 35, 255))
+                    else:
+                        newData.append(item)
+
+                img.putdata(newData)
+                image.paste(img, (k * i+12, k * j+12, k * i + 108, k * j + 108))
+    image.save("inventory.png", "PNG")
 
 def sieve(n):
     tr = [True]*(n+1)
