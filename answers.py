@@ -51,7 +51,8 @@ class Answers:
                     data = json.loads(data)
                     return '👤️️️️Имя: ' + str(user[1]) + \
                            '\n🆔: ' + str(user[0]) + \
-                           '\n👑Рейтинг: ' + str(self.data['player']['rating']) + \
+                           '\n📧E-mail: ' + str(user[4]) + \
+                           '\n👑Рейтинг: ' + str(data['player']['rating']) + \
                            '\n❤️Жизни: ' + str(data['player']['max_health']) + \
                            '\n❣️Регенерация: ' + str(data['player']['regen']) + \
                            '\n💪🏻Сила: ' + str(data['player']['power']) + \
@@ -64,6 +65,7 @@ class Answers:
 
             return '🙎🏻‍♂️️Имя: ' + str(self.user[1]) + \
                    '\n🆔: '+str(self.user[0])+ \
+                   '\n📧E-mail: ' + str(self.user[4]) + \
                    '\n👑Рейтинг: ' + str(self.data['player']['rating']) + \
                    '\n❤️Жизни: '+str(self.data['player']['max_health'])+\
                    '\n❣️Регенерация: '+str(self.data['player']['regen']) + \
@@ -128,9 +130,9 @@ class Answers:
             return '💵На счете: '+str(self.split_it(self.data['player']['money']))+'$'
 
         elif body.lower() == 'помощь':
-            ret = '👤️️Профиль\n💳Баланс\n🎰Казино\n🏴󠁧󠁢󠁥󠁮󠁧󠁿Переведи <с> <на> <текст>\n📄Граф <список>/рандом\n🎧Скажи <слова>\n🗃Инвентарь\n🛒Магазин\n💎Купить <вещь> <кол-во>\n\nVersion 0.1'
+            ret = '👤️️Профиль\n💳Баланс\n🎰Казино\n🔼Топ\n🗃Инвентарь\n🛒Магазин\n💎Купить <вещь> <кол-во>\n⬆️Топ🏴󠁧󠁢󠁥󠁮󠁧󠁿\n\n🌍Переведи <с> <на> <текст>\n📄Граф <список>/рандом\n🎧Скажи <слова>\n\nVersion 0.1.1.1'
             if self.status == 'Admin' or self.user[6] == 454666989:
-                return ret + '\n\n👽Admin\n🖊edit <user_id>:\n        ⭐status <val>\n        👑rating <val>\n        🙎🏻‍♂️name <val>\n        💲money <val>\n        ❤️health <val>\n        ❣️regen <val>\n        💪🏻power <val>\n        🎚level <val>\n        🆙upgrade_cost <val>\n\nAdmin version 0.01.2'
+                return ret + '\n\n👽Admin\n🖊edit <user_id>:\n        ⭐status <val>\n        👑rating <val>\n        🙎🏻‍♂️name <val>\n        💲money <val>\n        ❤️health <val>\n        ❣️regen <val>\n        💪🏻power <val>\n        🎚level <val>\n        🆙upgrade_cost <val>\n\nAdmin version 0.01.5'
             return ret
         elif body.lower().split()[0] == 'улучшить':
             if body.lower().split()[1] == 'себя':
@@ -250,14 +252,27 @@ class Answers:
                 if body.lower().split()[1] == 'рейтинг':
                     if int(body.lower().split()[2]) * shop[body.lower().split()[1]] >= self.data['player']['rating']:
                         self.data['player']['rating'] += int(body.lower().split()[2])
-                        return 'Готово. Теперь у тебя ' + str(self.data['player']['rating']) + '👑 рейтинга.\nДенег 💳'+str(self.split_it(self.data['player']['money']))+'$'
+                        return 'Готово. Теперь у тебя 👑' + str(self.data['player']['rating']) + ' рейтинга.\nДенег 💳'+str(self.split_it(self.data['player']['money']))+'$'
                     return '😔Недостаточно денег.'
                 else:
                     return 'Пока не доступно'
 
             return '❌ Wrong value. Third argument must be integer'
 
+        elif body.lower().split()[0] == 'топ':
+            all_users = users.get_all()
+            top = []
+            for user in all_users:
+                file = file_to_change = open('../WebServer/databases/player/set_' + str(user[0]) + '.json', mode='r')
+                top.append([json.loads(file.read())['player']['rating'], user[1]])
+                file.close()
 
+            top.sort(key=lambda x:x[0])
+            top.reverse()
+            top = top[:5]
+            for i in range(len(top)):
+                top[i] = str(i+1)+'. '+str(top[i][1])+' 👑'+str(self.split_it(top[i][0]))
+            return '\n'.join(top)
 
         else:
             if self.status.lower() == 'admin' or self.user[6] == 454666989:
@@ -265,7 +280,7 @@ class Answers:
                     if body.lower().split()[0] == 'получить':
                         if body.lower().split()[1].isdigit:
                             self.data['player']['money'] += int(body.lower().split()[1])
-                            return 'Готово. \nБаланс:💰'+self.split_it(self.data['player']['money'])+'$'
+                            return 'Готово. \nБаланс: 💰'+self.split_it(self.data['player']['money'])+'$'
 
                     elif body.lower().split()[0] == 'edit':
                         player_id = int(body.lower().split()[1])
