@@ -41,9 +41,12 @@ def repeat_all_messages(message):
             body = message.text.split('\n')[1:]
             email = body[0]
             password = '\n'.join(body[1:])
-            print(email,password)
-            answer = users.update_telegram_id(email,password, message.from_user.id)
-            users.update_telegram_id(email, password, message.from_user.id)
+            try:
+                answer = users.update_telegram_id(email,password, message.from_user.id)
+                users.update_telegram_id(email, password, message.from_user.id)
+            except IndexError:
+                answer = 'Wrong email or password'
+
             bot.send_message(message.chat.id, answer)
 
 
