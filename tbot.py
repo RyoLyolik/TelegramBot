@@ -14,7 +14,7 @@ ans = answers.Answers()
 
 @bot.message_handler(content_types=["text"])
 def repeat_all_messages(message):
-    body= message.text
+    body = message.text
     if users.get_by_tele(message.from_user.id) is not None:
         mes = ans.get_answer(body, message)
         if mes is not None and mes.split()[0] != 'file':
@@ -30,6 +30,8 @@ def repeat_all_messages(message):
             image = open(mes.split('|')[1], mode='rb')
             bot.send_photo(message.chat.id, image, mes.split('|')[2])
             image.close()
+
+        print('{\n'+users.get_by_tele(message.from_user.id)[1], str(users.get_by_tele(message.from_user.id)[0]) + ' / '+str(users.get_by_tele(message.from_user.id)[6])+': ' + str(body) + '\n\nBot: ' + str(mes)+'\n}\n')
 
     else:
         if ' '.join(message.text.split()[:2]) != 'LOG IN':
