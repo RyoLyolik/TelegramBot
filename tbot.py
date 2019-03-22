@@ -65,7 +65,8 @@ def repeat_all_messages(message):
             bot.send_message(message.chat.id, answer)
 
 
-
+def run():
+    bot.polling(none_stop=False)
 if __name__ == '__main__':
     print('Started')
-    bot.polling(none_stop=True)
+    run()

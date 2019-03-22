@@ -54,6 +54,7 @@ class Answers:
             return 'Telegram: ' + str(self.user[6]) + '\nIn game: ' + str(self.user[0])
 
         elif body.lower().split()[0] == 'профиль':
+            all_banned = [i.split('|')[0] for i in self.black_list]
             try:
                 if (self.status == 'admin' or self.status == 'moder' or self.user[6] == 454666989) and len(body.split()) > 1:
                     user = users.get(body.lower().split()[1])
@@ -65,27 +66,29 @@ class Answers:
                     return '👤️️️️Имя: ' + str(user[1]) + \
                            '\n🆔: ' + str(user[0]) + \
                            '\n📧E-mail: ' + str(user[4]) + \
-                           '\n👑Рейтинг: ' + str(data['player']['rating']) + \
-                           '\n❤️Жизни: ' + str(data['player']['max_health']) + \
-                           '\n❣️Регенерация: ' + str(data['player']['regen']) + \
-                           '\n💪🏻Сила: ' + str(data['player']['power']) + \
-                           '\n💰Деньги: ' + str(self.split_it(data['player']['money'])) + '$' + \
+                           '\n💰Деньги: ' + self.split_it(data['player']['money']) + '$' + \
+                           '\n👑Рейтинг: ' + self.split_it(str(data['player']['rating'])) + \
+                           '\n❤️Жизни: ' + str(self.split_it(data['player']['max_health'])) + \
+                           '\n❣️Регенерация: ' + str(self.split_it(data['player']['regen'])) + \
+                           '\n💪🏻Сила: ' + str(self.split_it(data['player']['power'])) + \
                            '\n🆙Стоимсоть улучшения: ' + str(
                         self.split_it(data['player']['upgrade_cost'])) + '$' + \
-                           '\n⭐Статус: ' + user[7]
+                           '\n⭐Статус: ' + user[7] + \
+                           '\n🚫Banned: ' + str(str(user[0]) in all_banned)
             except TypeError:
                 return '❌ ID does not exist. \n\nLine  ' + str(inspect.currentframe().f_lineno)
 
             return '🙎🏻‍♂️️Имя: ' + str(self.user[1]) + \
-                   '\n🆔: '+str(self.user[0])+ \
+                   '\n🆔: ' + str(self.user[0]) + \
                    '\n📧E-mail: ' + str(self.user[4]) + \
-                   '\n👑Рейтинг: ' + str(self.data['player']['rating']) + \
-                   '\n❤️Жизни: '+str(self.data['player']['max_health'])+\
-                   '\n❣️Регенерация: '+str(self.data['player']['regen']) + \
-                   '\n💪🏻Сила: ' + str(self.data['player']['power'])+\
-                   '\n💰Деньги: '+str(self.split_it(self.data['player']['money']))+'$'+\
-                   '\n🆙Стоимсоть улучшения: '+str(self.split_it(self.data['player']['upgrade_cost']))+'$'+\
-                   '\n⭐Статус: ' + self.status
+                   '\n💰Деньги: ' + str(self.split_it(self.data['player']['money'])) + '$' + \
+                   '\n👑Рейтинг: ' + self.split_it(self.data['player']['rating']) + \
+                   '\n❤️Жизни: ' + str(self.split_it(self.data['player']['max_health'])) + \
+                   '\n❣️Регенерация: ' + str(self.split_it(self.data['player']['regen'])) + \
+                   '\n💪🏻Сила: ' + str(self.split_it(self.data['player']['power'])) + \
+                   '\n🆙Стоимсоть улучшения: ' + str(self.split_it(self.data['player']['upgrade_cost'])) + '$' + \
+                   '\n⭐Статус: ' + self.status + \
+                   '\n🚫Banned: ' + str(str(self.user[0]) in all_banned)
 
         elif body.lower().split()[0] == 'казино' and len(body.split()) > 1:
             body = body.lower().split()
@@ -102,7 +105,7 @@ class Answers:
             mult = random.random()
             if bet < 0:
                 return 'Минимальная ставка 1$'
-            if mult < 0.05:
+            if mult < .050:
                 b = 0
                 bet *= 0
 
@@ -143,24 +146,30 @@ class Answers:
             return '💵На счете: '+str(self.split_it(self.data['player']['money']))+'$'
 
         elif body.lower() == 'помощь':
-            ret = '👤️️Профиль\n💳Баланс\n🎰Казино\n🔼Топ\n🗃Инвентарь\n🛒Магазин\n💎Купить <вещь> <кол-во>󠁧󠁢󠁥󠁮󠁧󠁿\n\n🌍Переведи <с> <на> <текст>\n📄Граф <список>/рандом\n🎧Скажи <слова>\n📝Реши <пример>\n\nVersion 0.1.4.1'
+            ret = '👤️️Профиль\n💳Баланс\n🎰Казиноn\n🗃Инвентарь\n⬆️Улучшить себя <к-во раз>\n🛒Магазин\n💎Купить <вещь> <кол-во>󠁧󠁢󠁥󠁮󠁧󠁿\n🔼Топ\n\n🌍Переведи <с> <на> <текст>\n📄Граф <список>/рандом\n🎧Скажи <слова>\n📝Реши <пример>\n\nVersion 0.1.5'
             if self.status == 'admin' or self.user[6] == 454666989:
-                return ret + '\n\n👽Admin\n💰Получить <сумма>\n🖊edit <user_id>:\n        ⭐status <val>\n        👑rating <val>\n        🙎🏻‍♂️name <val>\n        💲money <val>\n        ❤️health <val>\n        ❣️regen <val>\n        💪🏻power <val>\n        🎚level <val>\n        🆙upgrade_cost <val>\n\nAdmin version 0.0.3'
+                return ret + '\n\n👽Admin\n💰Получить <сумма>\n🖊edit <user_id>:\n        ⭐status <val>\n        👑rating <val>\n        🙎🏻‍♂️name <val>\n        💲money <val>\n        ❤️health <val>\n        ❣️regen <val>\n        💪🏻power <val>\n        🎚level <val>\n        🆙upgrade_cost <val>\n⛔Ban <id> <reason>\n✅Unban <id>\n\nAdmin version 0.0.4'
             elif self.status == 'moder' or self.user[6] == 454666989:
-                return ret + '\n\n📱Moder\n💰Получить <сумма>\n🖊edit me:\n        ⭐status <val>\n        👑rating <val>\n        🙎🏻‍♂️name <val>\n        💲money <val>\n        ❤️health <val>\n        ❣️regen <val>\n        💪🏻power <val>\n        🎚level <val>\n        🆙upgrade_cost <val>\n\nModer version 0.0.2'
+                return ret + '\n\n📱Moder\n💰Получить <сумма>\n🖊edit me:\n        ⭐status <val>\n        👑rating <val>\n        🙎🏻‍♂️name <val>\n        💲money <val>\n        ❤️health <val>\n        ❣️regen <val>\n        💪🏻power <val>\n        🎚level <val>\n        🆙upgrade_cost <val>\n⛔Ban <id> <reason>\n✅Unban <id>\n\nModer version 0.0.3'
             return ret
         elif body.lower().split()[0] == 'улучшить':
             if body.lower().split()[1] == 'себя':
-                if self.data['player']['money'] >= self.data['player']['upgrade_cost']:
-                    self.data['player']['money'] -= self.data['player']['upgrade_cost']
-                    self.data['player']['power'] = int(round((self.data['player']['power']+1)*1.03,0))
-                    self.data['player']['upgrade_cost'] = int(round(((self.data['player']['upgrade_cost']) * 1.06), 0))
-                    self.data['player']['max_health'] = int(round(((self.data['player']['max_health'])*1.04),0))
-                    self.data['player']['regen'] = round((self.data['player']['regen']+1) * 1.04, 5)
+                x = 1
+                if len(body.lower().split()) >= 3:
+                    if body.lower().split()[2].isdigit:
+                        x = int(body.lower().split()[2])
+
+                if self.data['player']['money'] >= self.data['player']['upgrade_cost'] * x:
+                    self.data['player']['money'] -= self.data['player']['upgrade_cost'] * x
+                    self.data['player']['power'] = int(round((self.data['player']['power'] + 1) * 1.03, 0)) * x
+                    self.data['player']['upgrade_cost'] = int(
+                        round(((self.data['player']['upgrade_cost']) * 1.06 + 1), 0)) * x
+                    self.data['player']['max_health'] = int(round(((self.data['player']['max_health']) * 1.04), 0)) * x
+                    self.data['player']['regen'] = round((self.data['player']['regen'] + 1) * 1.01, 0) * x
                     return 'Готово. Теперь: \n❤️Жизни: ' + str(
-                        self.data['player']['max_health']) + '\n❣️Регенерация: ' + str(
-                        self.data['player']['regen']) + '\n💪🏻Сила: ' + str(
-                        self.data['player']['power']) + '\n💰Деньги: ' + str(
+                        self.split_it(self.data['player']['max_health'])) + '\n❣️Регенерация: ' + str(
+                        self.split_it(self.data['player']['regen'])) + '\n💪🏻Сила: ' + str(
+                        self.split_it(self.data['player']['power'])) + '\n💰Деньги: ' + str(
                         self.split_it(self.data['player']['money'])) + '$'
                 return 'Недостаточно денег'
             return 'Пока нельзя это улучшать'
@@ -271,7 +280,9 @@ class Answers:
                         self.data['player']['money'] -= shop[body.lower().split()[1]] * int(
                             body.lower().split()[2])
                         self.data['player']['rating'] += int(body.lower().split()[2])
-                        return 'Готово. Теперь у тебя 👑' + str(self.data['player']['rating']) + ' рейтинга.\nДенег 💳'+str(self.split_it(self.data['player']['money']))+'$'
+                        return 'Готово. Теперь у тебя 👑' + self.split_it(
+                            self.data['player']['rating']) + ' рейтинга.\nДенег 💳' + str(
+                            self.split_it(self.data['player']['money'])) + '$'
                     return '😔Недостаточно денег.'
                 else:
                     return 'Пока не доступно'
@@ -281,8 +292,9 @@ class Answers:
         elif body.lower().split()[0] == 'топ':
             all_users = users.get_all()
             top = []
+            banned_ids = [i.split('|')[0] for i in self.black_list]
             for user in all_users:
-                if user[7] == 'user' and user[6] != 454666989:
+                if user[7] == 'user' and user[6] != 454666989 and str(user[0]) not in banned_ids:
                     file = file_to_change = open('../WebServer/databases/player/set_' + str(user[0]) + '.json', mode='r')
                     top.append([json.loads(file.read())['player']['rating'], user[1], user[0]])
                     file.close()
@@ -298,17 +310,32 @@ class Answers:
                 return 'Выражение равно:\n'+str(eval(''.join(body.lower().split()[1:])))+'\nИли\n' + self.split_it((eval(''.join(body.lower().split()[1:]))))
             except NameError:
                 return '❌ Wrong value. \n\nLine  ' + str(inspect.currentframe().f_lineno) if self.status == 'admin' or self.status == 'moder' or self.user[6] == 454666989 else '❌ Wrong value.'
+        elif body.lower().split()[0] == 'заново':
+            if body.lower().split()[1] == self.user[2]:
+                file = open('../WebServer/databases/default.json', mode='r')
+                default_data = file.read()
+                file.close()
+                default_data = json.loads(default_data)
+                self.data = default_data
+                return 'Вы начали заново.'
+
+            return 'Неверный пароль.'
 
         else:
             if self.status.lower() == 'admin' or self.user[6] == 454666989:
                 try:
+                    all_users = users.get_all()
+                    all_ids = [str(user[0]) for user in all_users]
                     if body.lower().split()[0] == 'edit' and len(body.split()) >= 3 and body.lower().split()[1] != 'me':
                         player_id = int(body.lower().split()[1])
                         if body.lower().split()[2] == 'status' and (player_id != self.user[7] or self.user[7] == 454666989):
                             if body.lower().split()[3] not in 'moderadminuser':
                                 raise ValueError
-                            users.update_status(player_id, body.lower().split()[3])
-                            return '🙂Готово. Теперь игрок ' + str(users.get(player_id)[1]) + ' (' + str(player_id) + ') имеет статус ' + body.lower().split()[3]
+                            if body.lower().split()[1] in all_ids:
+                                users.update_status(player_id, body.lower().split()[3])
+                                return '🙂Готово. Теперь игрок ' + str(users.get(player_id)[1]) + ' (' + str(
+                                    player_id) + ') имеет статус ' + body.lower().split()[3]
+                            return '❌ ID does not exist.'
 
                         elif body.lower().split()[2] == 'name':
                             users.update_name(player_id, ' '.join(body.split()[3:]))
@@ -377,39 +404,50 @@ class Answers:
                             if int(player_id) == self.user[0]:
                                 self.data = data_player
                             return '🙂Готово. Теперь ты имеешь ' + body.lower().split()[2] + ' ' + str(self.split_it(body.split()[3]))
-
-                    elif body.lower().split()[0] == 'ban':
-                        all_users = users.get_all()
-                        all_ids = [str(user[0]) for user in all_users]
-                        all_banned = [i.split('|')[0] for i in self.black_list]
-                        if body.lower().split()[1] != str(self.user[0]):
-                            if body.lower().split()[1] in all_ids and body.lower().split()[1] not in all_banned:
-                                will_ban_user = users.get(body.lower().split()[1])
-                                if len(body.lower().split()) >= 3:
-                                    if (status_system[self.status] < status_system[will_ban_user[7]] and will_ban_user[6] != 454666989) or self.user[6] == 454666989:
-                                        if '|' not in ' '.join(body.split()[2:]):
-                                            self.black_list.append(body.lower().split()[1]+'|'+str(self.user[0])+'|'+' '.join(body.split()[2:]))
-                                            return body.lower().split()[1]+' (' + users.get(body.lower().split()[1])[1] + ') was banned. Reason: ' + ' '.join(body.split()[2:])
-                                        return '❌ Wrong symbol "|".'
-                                    return '❌ You tries to ban user that above you by status.'
-                                return '❌ No reason.'
-                            elif body.lower().split()[1] in all_banned:
-                                return '❌ This player has already banned.'
-                            return '❌ ID does not exists.'
-                        return '❌ You wants to ban yourself.'
-
-                    elif body.lower().split()[0] == 'unban':
-                        all_users = users.get_all()
-                        all_banned = [i.split('|')[0] for i in self.black_list]
-                        if body.lower().split()[1] in all_banned:
-                            self.black_list.pop(all_banned.index(body.lower().split()[1]))
-                            return body.lower().split()[1] + ' (' + \
-                                   users.get(body.lower().split()[1])[1] + ') was unbanned successful.'
-                        return '❌ ID does not banned.'
-
-
                 except ValueError:
                     return '❌ Wrong value. \n\nLine  ' + str(inspect.currentframe().f_lineno)
+
+                if body.lower().split()[0] == 'ban' and len(body.lower().split()) >= 3:
+                    all_users = users.get_all()
+                    all_ids = [str(user[0]) for user in all_users]
+                    all_banned = [i.split('|')[0] for i in self.black_list]
+                    if body.lower().split()[1] != str(self.user[0]):
+                        if body.lower().split()[1] in all_ids and body.lower().split()[1] not in all_banned:
+                            will_ban_user = users.get(body.lower().split()[1])
+                            if len(body.lower().split()) >= 3:
+                                if (status_system[self.status] < status_system[will_ban_user[7]] and will_ban_user[
+                                    6] != 454666989) or self.user[6] == 454666989:
+                                    if '|' not in ' '.join(body.split()[2:]):
+                                        self.black_list.append(
+                                            body.lower().split()[1] + '|' + str(self.user[0]) + '|' + ' '.join(
+                                                body.split()[2:]))
+                                        return body.lower().split()[1] + ' (' + users.get(body.lower().split()[1])[
+                                            1] + ') was banned. Reason: ' + ' '.join(body.split()[2:])
+                                    return '❌ Wrong symbol "|".'
+                                return '❌ You tries to ban user that above you by status.'
+                            return '❌ No reason.'
+                        elif body.lower().split()[1] in all_banned:
+                            return '❌ This player has already banned.'
+                        return '❌ ID does not exists.'
+                    return '❌ You wants to ban yourself.'
+                elif body.lower().split()[0] == 'ban' and len(body.lower().split()) < 3:
+                    return '❌ No reason.'
+
+                elif body.lower().split()[0] == 'unban':
+                    all_users = users.get_all()
+                    all_banned = [i.split('|')[0] for i in self.black_list]
+                    if body.lower().split()[1] in all_banned:
+                        self.black_list.pop(all_banned.index(body.lower().split()[1]))
+                        return body.lower().split()[1] + ' (' + \
+                               users.get(body.lower().split()[1])[1] + ') was unbanned successful.'
+                    return '❌ ID does not banned.'
+
+                elif body.lower().split()[0] == 'get_all' or body.lower().split()[0] == 'all':
+                    all_users = users.get_all()
+                    all = [str(i) + '. ID: ' + str(all_users[i][0]) + ' Name: ' + all_users[i][1] for i in
+                           range(len(all_users))]
+                    return '\n'.join(all)
+
 
 
 
