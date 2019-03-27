@@ -67,6 +67,8 @@ def repeat_all_messages(message):
 
 def run():
     bot.polling(none_stop=False)
+
+
 if __name__ == '__main__':
-    print('Started')
+    print('The BOT started')
     run()
