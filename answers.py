@@ -325,19 +325,37 @@ class Answers:
             return 'Вы не указали пароль'
 
         elif body.lower().split()[0] == 'wa' and len(body.lower().split()) >= 3:
-            res = client.query(' '.join(body.split()[1:]))
+            try:
+                res = client.query(' '.join(body.split()[1:]))
+            except Exception:
+                return '❌ Error. Try again.'
             if res['@error'] == 'false' and res['@success'] == 'true':
                 if body.lower().split()[1] == 'solve':
-                    pre = [i for i in res.results]
-                    pre = pre[0]['subpod']
-                    re_val = ''
-                    if isinstance(pre, list):
-                        for i in pre:
-                            re_val += i['img']['@title'] + '\n'
-                    else:
-                        re_val = pre['img']['@title']
+                    try:
+                        pre = [i for i in res.results]
+                        pre = pre[0]['subpod']
+                        re_val = ''
+                        if isinstance(pre, list):
+                            for i in pre:
+                                re_val += i['img']['@title'] + '\n'
+                        else:
+                            re_val = pre['img']['@title']
 
-                    return str(re_val)
+                        return str(re_val)
+
+                    except IndexError:
+                        pre = res['pod']
+                        re_val = ''
+                        if isinstance(pre, list):
+                            pre = pre[1]['subpod']
+                            if isinstance(pre, list):
+                                for i in pre:
+                                    re_val += str(i['img']['@title'])+'\n\n'
+
+                            else:
+                                re_val += str(pre['img']['@title']) + '\n\n'
+
+                        return re_val
 
                 elif body.lower().split()[1] == 'plot':
                     pre = res['pod'][1]['subpod']
