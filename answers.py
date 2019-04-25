@@ -26,9 +26,15 @@ items = {
     'Usual_Sword': 'textures/items/usual_sword.png',
     'Secret_Sword': 'textures/items/secret_sword.png'
 }
-
 shop = {
-    'рейтинг': 1000000
+    'рейтинг': 1000000,
+    'меч': {
+        'type': 'Usual_Sword',
+        'level': 1,
+        'power': 10,
+        'upgrade_cost': 10,
+        'cost': 100
+    }
 }
 
 status_system = {
@@ -41,8 +47,11 @@ class Answers:
     def __init__(self):
         pass
 
-    def get_answer(self, body, message):
-        user_id = message.from_user.id
+    def get_answer(self, body, message, use_inline=False):
+        if use_inline:
+            user_id = message.chat.id
+        else:
+            user_id = message.from_user.id
         self.user = users.get_by_tele(user_id)
         file = open('../WebServer/databases/player/set_' + str(self.user[0]) + '.json', mode='r')
         self.data = file.read()
@@ -258,34 +267,51 @@ class Answers:
             else:
                 cord = json.loads(' '.join(body.lower().split()[1:]))
             graph(cord)
-            return 'file image|drew.png|Вот граф '+str(cord)
+            return 'file image|Вот граф '+str(cord)
 
         elif body.lower().split()[0] == 'инвентарь':
             invsee = [[],[],[],[],[],[],[],[]]
             cnt = 0
-            for i in self.data['inventory']:
-                invsee[cnt % 8].append(items[self.data['inventory'][i]['type']])
+            for i in range(40):
+                invsee[cnt % 8].append(items[self.data['inventory'][str(i)]['type']])
                 cnt += 1
-            invsee[cnt % 8].append(items[self.data['inventory'][i]['type']])
+            invsee[cnt % 8].append(items[self.data['inventory'][str(i)]['type']])
             draw_inventory(invsee)
 
-            return 'file image|inventory.png|🗃Ваш инвентарь:'
+            return 'file image|🗃Ваш инвентарь:'
 
         elif body.lower() == 'магазин':
-            return '👑Рейтинг: 1шт = 1.000.000$'
+            return 'Магазин:\n👑Рейтинг: 1шт = 1.000.000$'
 
         elif body.lower().split()[0] == 'купить':
+            if len(body.lower().split()) == 2:
+                body += ' 1'
+            print(body)
             if body.lower().split()[1] in shop and body.lower().split()[2].isdigit():
                 if body.lower().split()[1] == 'рейтинг':
                     if int(body.lower().split()[2]) * shop[body.lower().split()[1]] <= self.data['player']['money']:
                         self.data['player']['money'] -= shop[body.lower().split()[1]] * int(
                             body.lower().split()[2])
                         self.data['player']['rating'] += int(body.lower().split()[2])
+
                         return 'Готово. Теперь у тебя 👑' + self.split_it(
                             self.data['player']['rating']) + ' рейтинга.\nДенег 💳' + str(
                             self.split_it(self.data['player']['money'])) + '$'
                     return '😔Недостаточно денег.'
                 else:
+                    if body.lower().split()[1] in shop:
+                        invsee = [[], [], [], [], []]
+                        cnt = 0
+                        for i in range(40):
+                            if items[self.data['inventory'][str(i)]['type']] is None:
+                                n = i
+                                break
+                        obj = shop[body.lower().split()[1]]
+                        if obj['cost'] <= self.data['player']['money']:
+                            self.data['inventory'][str(n)] =obj
+                            self.data['player']['money'] -= obj['cost']
+                            return 'Вы купили: ' + str(shop[body.lower().split()[1]]['type'])
+                        return '😔Недостаточно денег.'
                     return 'Пока не доступно'
 
             return '❌ Wrong value. Third argument must be integer. \n\nLine  ' + str(inspect.currentframe().f_lineno) if self.status == 'admin' or self.status == 'moder' or self.user[6] == 454666989 else '❌ Wrong value. Third argument must be integer.'
@@ -501,8 +527,6 @@ class Answers:
 
                 elif body.lower().split()[0] == 'blacklist' or body.lower().split()[0] == 'banlist':
                     return '\n'.join([' | '.join(i.split('|')) for i in self.black_list])
-
-
 
 
     def save(self):

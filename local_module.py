@@ -115,7 +115,7 @@ def draw_inventory(objects):
 
                 img.putdata(newData)
                 image.paste(img, (k * i+12, k * j+12, k * i + 108, k * j + 108))
-    image.save("inventory.png", "PNG")
+    image.save("drew.png", "PNG")
 
 def sieve(n):
     tr = [True]*(n+1)
