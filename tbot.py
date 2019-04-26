@@ -6,6 +6,7 @@ from layout import users, lvls, dbase
 import answers
 import json
 import logging
+import datetime
 
 ans = answers.Answers()
 keyboard = [['Помощь','/shop'],['/close']]
@@ -15,7 +16,6 @@ remove_kb = ReplyKeyboardRemove()
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO, filename='data.log')
 logger = logging.getLogger(__name__)
-
 def inline_keyboard(update, context):
     inline_buttons = [[InlineKeyboardButton("Рейтинг: 1кк/шт.", callback_data='купить рейтинг'),
                  InlineKeyboardButton("Меч", callback_data='купить меч')],
@@ -85,7 +85,7 @@ def show_keyboard(update, bot):
 
 def error(update, context):
     """Log Errors caused by Updates."""
-    logger.warning('Update "%s" caused error "%s"', update, context.error)
+    logger.warning(str(datetime.datetime.now()) + ', Update - "%s". \t\tCaused error - "%s"', update, context.error)
 
 def main():
     updater = Updater('624990039:AAGTYXZ6cpD-GRCmgKLXDfBhrEz7WUPpUYk', use_context=True)
@@ -104,6 +104,7 @@ def main():
     dp.add_handler(callback_query_handler)
     updater.dispatcher.add_error_handler(error)
     dp.add_handler(close_keyboard)
+    updater.dispatcher.add_error_handler(error)
 
     updater.start_polling()
 
